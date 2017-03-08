@@ -2,17 +2,17 @@ module.exports = {
 
   // Your bot name. Typically, this is your bot's username without the discriminator.
   // i.e: if your bot's username is MemeBot#0420, then this option would be MemeBot.
-  name: "Tyderion&#39;s Overwatch Bot",
+  name: "YOUR-BOT-USERNAME",
 
   // The bot's command prefix. The bot will recognize as command any message that begins with it.
-  // i.e: "-tyderion&#39;s overwatch bot foo" will trigger the command "foo",
-  //      whereas "Tyderion&#39;s Overwatch Bot foo" will do nothing at all.
-  prefix:  "-tyderion&#39;s overwatch bot",
+  // i.e: "-tyderion's' overwatch bot foo" will trigger the command "foo",
+  //      whereas "YOUR-BOT-USERNAME foo" will do nothing at all.
+  prefix:  "|tydow",
 
   // Your bot's user token. If you don't know what that is, go here:
   // https://discordapp.com/developers/applications/me
   // Then create a new application and grab your token.
-  token: "",
+  token: "YOUR-BOT-TOKEN",
 
   // If this option is enabled, the bot will delete the message that triggered it, and its own
   // response, after the specified amount of time has passed.
