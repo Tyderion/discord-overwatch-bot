@@ -1,4 +1,4 @@
-import { RichEmbed, Message } from discord.js;
+import { RichEmbed, Message } from 'discord.js';
 
 export interface ResponseConfig {
   channel: string;
