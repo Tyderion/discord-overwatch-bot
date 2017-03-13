@@ -1,4 +1,4 @@
-import { CompAllHeroes, HeroUsage, Profile, HeroDetailsCommon } from './types';
+import { CompAllHeroes, HeroUsage, Profile, HeroDetailsCommon, Wrapper, HeroDetails } from './types';
 import { get } from './request';
 
 
@@ -14,43 +14,49 @@ const getJson = <T>(url: string): Promise<T> => {
   });
 }
 
-/**
- * @param  {string} tag
- * @param  {string} region
- */
-export function getCompInfoProfile(tag, region): Promise<Profile> {
-  const url = `https://api.lootbox.eu/pc/${region}/${tag.replace('#', '-')}/profile`;
-  return getJson<{ data: Profile }>(url).then(r => r.data);
+const BASE_URL = 'https://api.lootbox.eu';
+const tagToUrl = (tag: string): string => tag.replace('#', '-');
+const createUrl = (tag: string, region: string, platform: string): string => {
+  const url = `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`;
+  console.log('creating url: ', platform,' - ',  region, ': ', url);
+  return `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`
 }
 
-/**
- * @param  {string} tag
- * @param  {string} region
- */
-export function getCompInfoAll(tag, region): Promise<CompAllHeroes> {
-  const url = `https://api.lootbox.eu/pc/${region}/${tag.replace('#', '-')}/competitive/allHeroes/`;
-  return getJson<CompAllHeroes>(url).then(result => {
-    console.log('info all', result);
-    return result;
-  });
+export interface NameConverter {
+  toDisplay: (string) => string;
+  toUrl: (string) => string;
+
 }
 
-/**
- * @param  {string} tag
- * @param  {string} region
- */
-export function getPlayedCompHeroes(tag, region): Promise<HeroUsage[]> {
-  const url = `https://api.lootbox.eu/pc/${region}/${tag.replace('#', '-')}/competitive/heroes`;
-  return getJson<HeroUsage[]>(url);
-}
-const sanitizeNames = name => name.replace('Lúcio', 'Lucio').replace('Torbjörn', 'Torbjoern').replace('Soldier: 76', 'Soldier76');
+export const convertNames: NameConverter = (() => {
+  const lucio = {
+    regex: /L&#xFA;cio|Lucio|Lúcio/g,
+    display: 'Lúcio',
+    url: 'Lucio'
+  }
+  const torb = {
+    regex: /Torbj&#xF6;rn|Torbjoern|Torbjörn/g,
+    display: 'Torbjörn',
+    url: 'Torbjoern'
+  }
+  const soldier = {
+    regex: /Soldier: 76|Soldier76/g,
+    display: 'Soldier: 76',
+    url: 'Soldier76'
+  }
+  return {
+    toDisplay: name => name.replace(lucio.regex, lucio.display).replace(torb.regex, torb.display).replace(soldier.regex, soldier.display),
+    toUrl: names => names.replace(lucio.regex, lucio.url).replace(torb.regex, torb.url).replace(soldier.regex, soldier.url)
+  };
+})()
 
-/**
- * @param  {string} tag
- * @param  {string} region
- */
-export function getCompHeroDetails(tag, region, heroes): Promise<{ [name: string]: HeroDetailsCommon }> {
-  const fixedNames = sanitizeNames(heroes);
-  const url = `https://api.lootbox.eu/pc/${region}/${tag.replace('#', '-')}/competitive/hero/${fixedNames}/`;
-  return getJson<{ [name: string]: HeroDetailsCommon }>(url);
+export const getCompInfoProfile = (tag: string, region: string, platform: string): Promise<Profile> => getJson<Wrapper<Profile>>(`${createUrl(tag, region, platform)}/profile`).then(r => r.data);
+
+export const getCompInfoAll = (tag: string, region: string, platform: string): Promise<CompAllHeroes> => getJson<CompAllHeroes>(`${createUrl(tag, region, platform)}/competitive/allHeroes/`);
+
+export const getCompHeroes = (tag: string, region: string, platform: string): Promise<HeroUsage[]> => getJson<HeroUsage[]>(`${createUrl(tag, region, platform)}/competitive/heroes`);
+
+export const getCompHeroDetails = (tag: string, region: string, platform: string, heroes: HeroUsage[]): Promise<HeroDetails> => {
+  const names = convertNames.toUrl(heroes.map(hero => hero.name).join());
+  return getJson<HeroDetails>(`${createUrl(tag, region, platform)}/competitive/hero/${names}/`);
 }

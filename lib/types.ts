@@ -142,3 +142,11 @@ export interface HeroDetailsCommon {
   WinPercentage: string;
   GamesTied: string;
 }
+
+export interface Wrapper<T> {
+  data: T
+}
+
+export interface HeroDetails { 
+  [name: string]: HeroDetailsCommon 
+}
