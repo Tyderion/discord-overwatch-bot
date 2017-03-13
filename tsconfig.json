@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "strictNullChecks": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "allowJs": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "skipLibCheck": true,
+    "lib": [
+      "es2017", "dom"
+    ]
+  },
+  "awesomeTypescriptLoaderOptions": {
+    "doTypeCheck": true,
+    "forkChecker": true
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "release",
+    "index.js",
+    "webpack.config.js",
+    "config",
+    "cordova"
+  ]
+}
