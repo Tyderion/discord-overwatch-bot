@@ -19,16 +19,24 @@ export default new Command({
     },
     {
       name: 'region',
-      desc: 'The region the user plays in, one of "eu", "us", "kr", "cn", "global"',
+      desc: 'The region the user plays in, one of "eu", "us", "kr", "cn" or "global"',
       type: 'string',
       required: false,
-      default: 'eu'
+      default: 'eu',
+      validations: [{
+        errorMessage: 'Must be one of "eu", "us", "kr", "cn" or "global"',
+        validate: val => ['eu', 'us', 'kr', 'cn', 'global'].indexOf(val) !== -1
+      }]
     }, {
       name: 'platform',
-      desc: 'The platform the user plays on, one of "pc", "xbl", "psn"',
+      desc: 'The platform the user plays on, one of "pc", "xbl" or "psn"',
       type: 'string',
       required: false,
-      default: 'pc'
+      default: 'pc',
+      validations: [{
+        errorMessage: 'Must be one of "pc", "xbl" or "psn"',
+        validate: val => ['pc', 'xbl', 'psn'].indexOf(val) !== -1
+      }]
     }
   ],
   flags: [
