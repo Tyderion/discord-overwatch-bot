@@ -61,4 +61,4 @@ typings/
 *.sqlite
 
 *.js.map
-lib/commands/*.js
+lib/**/*.js
