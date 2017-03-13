@@ -1,16 +1,13 @@
-var Clapp = require('../modules/clapp-discord');
-var storage = require('../storage');
-let cheerio = require('cheerio');
-const request = require('request');
-const moment = require('moment');
-const URL = require('url');
-const Discord = require('discord.js');
+import * as cheerio from 'cheerio';
+import * as request from 'request';
+import * as moment from 'moment';
+import * as URL from 'url';
+import { Context } from './../types';
+import { Command } from '../modules/clapp-discord/index.js';
+import { getChannel } from '../storage.js';
+import { RichEmbed } from 'discord.js';
 
-/**
- * @param  {string} url
- * @returns {Promise<string>}
- */
-function get(url) {
+const get = (url: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         request(url, function (error, response, body) {
             if (error) {
@@ -18,15 +15,26 @@ function get(url) {
             }
             resolve(body);
         });
-    })
+    });
 }
 // Test: !tow bp https://us.battle.net/forums/en/overwatch/topic/20753436342
 
-module.exports = new Clapp.Command({
+export default new Command({
     name: "bp",
     desc: "Parses the linked blue battle.net forum post and transcribes the content to the channel",
-    fn: (argv, context) => {
-        return storage.getChannel().then(channel => {
+
+    args: [
+        {
+            name: 'url',
+            desc: 'The url of the blue post',
+            type: 'string',
+            required: true
+        }
+    ],
+    flags: [
+    ],
+    fn: (argv: { args: { url: string }}, context: Context) => {
+        return getChannel().then(channel => {
             context.responseConfig.channel = channel.channel;
             return new Promise((resolve, reject) => {
                 if (context.msg.deletable) {
@@ -48,7 +56,7 @@ module.exports = new Clapp.Command({
                         .replace(/<span class="underline">(.*?)<\/span>/g, '__$1__');
                     let text = cheerio.load(postcontent).text();
 
-                    const embed = new Discord.RichEmbed({
+                    const embed = new RichEmbed({
                         title: title,
                         description: text,
                         url: url,
@@ -67,15 +75,5 @@ module.exports = new Clapp.Command({
             });
         })
 
-    },
-    args: [
-        {
-            name: 'url',
-            desc: 'The url of the blue post',
-            type: 'string',
-            required: true
-        }
-    ],
-    flags: [
-    ]
+    }
 });
