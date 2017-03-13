@@ -1,7 +1,7 @@
 import { responseToSameChannel } from './../helper';
 import { Context } from './../types';
 import { Command } from '../modules/clapp-discord/index.js';
-import { add } from '../storage.js';
+import { addTag } from '../storage';
 
 export default new Command({
   name: "tag",
@@ -24,6 +24,6 @@ export default new Command({
   ],
   fn: (argv, context: Context) => {
     responseToSameChannel(context);
-    return add(argv.args.nickname, argv.args.battletag).then(() => `Successfully added battletag ${argv.args.battletag} as ${argv.args.nickname}`);
+    return addTag(argv.args.nickname, argv.args.battletag).then(() => `Successfully added battletag ${argv.args.battletag} as ${argv.args.nickname}`);
   }
 });

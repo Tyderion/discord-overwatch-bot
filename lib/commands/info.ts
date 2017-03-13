@@ -1,6 +1,6 @@
+import { getTag } from './../storage';
 import { responseToSameChannel } from './../helper';
 import { Command } from '../modules/clapp-discord/index.js';
-import { get } from '../storage.js';
 import { getCompHeroDetails, getCompInfoAll, getCompInfoProfile, getPlayedCompHeroes } from '../owapi.js';
 import { RichEmbed } from 'discord.js';
 import { Context } from '../types';
@@ -25,7 +25,7 @@ export default new Command({
     responseToSameChannel(context);
     const nickname = argv.args.nickname;
     const region = 'eu';
-    const battletag = (await get(nickname)).battletag;
+    const battletag = (await getTag(nickname)).battletag;
     const [info, allHeroes, playedHeroes] = await Promise.all([
       getCompInfoProfile(battletag, region),
       getCompInfoAll(battletag, region),
