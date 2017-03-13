@@ -8,7 +8,6 @@ export default new Command({
   name: "setbpc",
   desc: "Sets the channel from which this command is sent as the default channel for transcribing blueposts",
   fn: (argv, context: Context) => {
-    console.log(context.msg.channel);
     if (context.msg.channel.type !== 'text') {
       return 'Please use this command in a text channel';
     }

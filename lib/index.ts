@@ -1,6 +1,8 @@
 'use strict';
 require('node-sigint');
 
+import { Context } from './types';
+
 const fs = require('fs');
 const Clapp = require('./modules/clapp-discord');
 const cfg = require('../config.js');
@@ -20,11 +22,14 @@ var app = new Clapp.App({
   desc: pkg.description,
   prefix: cfg.prefix,
   version: pkg.version,
-  onReply: (msg, context) => {
+  onReply: (msg, context: Context) => {
     // Fired when input is needed to be shown to the user
     if (context.responseConfig.channel) {
       if (context.responseConfig.useEmbed) {
-        bot.channels.get(context.responseConfig.channel).sendEmbed(context.responseConfig.embed).catch(err => console.log(err.message));
+        context.responseConfig.embeds.reduce((acc, curr) => {
+          return bot.channels.get(context.responseConfig.channel).sendEmbed(curr).catch(err => console.log(err.message));
+        }, Promise.resolve())
+        // bot.channels.get(context.responseConfig.channel).sendEmbed(context.responseConfig.embed).catch(err => console.log(err.message));
       } else {
         bot.channels.get(context.responseConfig.channel).sendMessage(msg);
       }

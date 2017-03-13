@@ -53,8 +53,6 @@ export default new Command({
       getCompHeroes(battletag, region, platform)
     ]);
 
-    console.log(playedHeroes);
-
     const top5 = playedHeroes.filter(hero => hero.playtime !== '--').slice(0, 5);
     const embed = new RichEmbed({
       title: `Competitive stats for ${battletag} (Level ${info.level})`,
@@ -79,7 +77,7 @@ export default new Command({
       let str = `${time.replace(/([0-9]+)([a-zA-Z]+)/, '$1 $2')}: ${hero.WinPercentage} wins`
       embed.addField(convertNames.toDisplay(name), str);
     });
-    context.responseConfig.embed = embed;
+    context.responseConfig.embeds = [embed];
     context.responseConfig.useEmbed = true;
     return ' ';
   }
