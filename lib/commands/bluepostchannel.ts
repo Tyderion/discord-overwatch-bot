@@ -2,7 +2,7 @@ import { responseToSameChannel } from './../helper';
 import { Context } from './../types';
 import { Command } from '../modules/clapp-discord/index.js';
 import { setChannel } from '../storage';
-import { TextChannel } from 'discord.js';
+import { TextChannel } from 'discord.js';
 
 export default new Command({
   name: "setbpc",
