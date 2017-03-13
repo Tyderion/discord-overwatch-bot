@@ -1,4 +1,4 @@
-import { RichEmbed, Message } from discord.js;
+import { RichEmbed, Message } from 'discord.js';
 
 export interface ResponseConfig {
   channel: string;
@@ -141,4 +141,12 @@ export interface HeroDetailsCommon {
   TimeSpentonFire: string;
   WinPercentage: string;
   GamesTied: string;
+}
+
+export interface Wrapper<T> {
+  data: T
+}
+
+export interface HeroDetails { 
+  [name: string]: HeroDetailsCommon 
 }
