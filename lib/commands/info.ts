@@ -1,9 +1,9 @@
 import { getTag } from './../storage';
 import { responseToSameChannel } from './../helper';
 import { Command } from '../modules/clapp-discord/index.js';
-import { getCompHeroDetails, getCompInfoAll, getCompInfoProfile, getPlayedCompHeroes } from '../owapi.js';
+import { getCompHeroDetails, getCompInfoAll, getCompInfoProfile, getPlayedCompHeroes } from './../owapi';
 import { RichEmbed } from 'discord.js';
-import { Context } from '../types';
+import { Context, CompAllHeroes, HeroUsage, Profile } from './../types';
 
 const sanitizeNameForMessage = name => name.replace('L&#xFA;cio', 'Lúcio').replace('Torbj&#xF6;rn', 'Torbjörn').replace('Torbjoern', 'Torbjörn').replace('Lucio', 'Lúcio').replace('Soldier76', 'Soldier: 76');
 const orZero = p => p ? p : 0;
@@ -26,7 +26,7 @@ export default new Command({
     const nickname = argv.args.nickname;
     const region = 'eu';
     const battletag = (await getTag(nickname)).battletag;
-    const [info, allHeroes, playedHeroes] = await Promise.all([
+    const [info, allHeroes, playedHeroes]= await Promise.all<Profile, CompAllHeroes, HeroUsage[]>([
       getCompInfoProfile(battletag, region),
       getCompInfoAll(battletag, region),
       getPlayedCompHeroes(battletag, region)
@@ -46,7 +46,7 @@ export default new Command({
     embed.addField('Eliminations', allHeroes.Eliminations, true);
     embed.addField('Deaths', allHeroes.Deaths, true);
     embed.addField('Elims/Deaths', kd, true);
-    embed.addField('Medals', `${allHeroes.Medals} (${allHeroes['Medals-Gold']}/${allHeroes['Medals-Silver']}/${allHeroes['Medals-Bronze']})`, true);
+    embed.addField('Medals', `${allHeroes.Medals} (${allHeroes.Medals_Gold}/${allHeroes.Medals_Silver}/${allHeroes.Medals_Bronze})`, true);
     embed.addField('Cards', allHeroes.Cards, true);
 
     const heroDetails = await getCompHeroDetails(battletag, region, top5.map(h => sanitizeNameForMessage(h.name)).join(','));
