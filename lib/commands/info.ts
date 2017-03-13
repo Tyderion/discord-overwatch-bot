@@ -8,7 +8,7 @@ import { Context, CompAllHeroes, HeroUsage, Profile  } from './../types';
 const orZero = p => p ? p : 0;
 
 export default new Command({
-  name: "info2",
+  name: "info",
   desc: "Get Overwatch Info for a registered nickname",
   args: [
     {
