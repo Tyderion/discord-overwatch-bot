@@ -19,7 +19,11 @@ export default new Command({
       name: 'url',
       desc: 'The url of the blue post',
       type: 'string',
-      required: true
+      required: true,
+      validations: [{
+        errorMessage: 'The link has to be to a topic on the blizzard overwatch forums.',
+        validate: (val: string) => val.indexOf('battle.net/forums/en/overwatch/topic/') !== -1
+      }]
     }
   ],
   flags: [
@@ -31,7 +35,7 @@ export default new Command({
         if (context.msg.deletable) {
           context.msg.delete();
         }
-        const url = argv.args.url;
+        const url = argv.args.url.startsWith('http') ? argv.args.url : 'https://' + argv.args.url;
         get(url).then(body => {
           const posturl = URL.parse(url);
           const $ = cheerio.load(body);
