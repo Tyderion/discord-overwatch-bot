@@ -2,9 +2,11 @@
 require('node-sigint');
 
 import { Context } from './types';
-import {Logger } from './logger';
+import {Logger, LogLevel } from './logger';
 
 const log = Logger.create('base');
+
+Logger.LogLevel = LogLevel.ERROR;
 
 log.log('this is the base logger');
 
