@@ -2,6 +2,13 @@
 require('node-sigint');
 
 import { Context } from './types';
+import {Logger } from './logger';
+
+const log = Logger.create('base');
+
+log.log('this is the base logger');
+
+log.sub('part').log('this is a part logger')
 
 const fs = require('fs');
 const Clapp = require('./modules/clapp-discord');
