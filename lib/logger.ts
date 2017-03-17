@@ -1,10 +1,10 @@
-type LogMethods = keyof Pick<Console, 'log' | 'info' | 'error' | 'debug' | 'warn'>;
+type LogMethod = keyof Pick<Console, 'log' | 'info' | 'error' | 'warn'>;
 
 export interface Configuration {
     scope: Partial<Scope>;
     logLevel: LogLevel;
     defaultLevels: {
-        [P in LogMethods]: LogLevel
+        [P in LogMethod]: LogLevel
     }
 }
 
@@ -19,7 +19,6 @@ export enum LogLevel {
     ERROR = 0,
     WARN = 1,
     INFO = 2,
-    DEBUG = 3,
     ALL = 4
 }
 
@@ -33,17 +32,17 @@ export class Logger {
                 delimiter: ':',
                 end: ':'
             },
-            logLevel: LogLevel.DEBUG,
+            logLevel: LogLevel.ALL,
             defaultLevels: {
-                log: LogLevel.DEBUG,
+                log: LogLevel.ALL,
                 info: LogLevel.INFO,
                 warn: LogLevel.WARN,
-                debug: LogLevel.DEBUG,
                 error: LogLevel.ERROR
             }
         }
     }
     private static config: Configuration = Logger.DEFAULT_CONFIG;
+    private static currentScope: string = '';
     public static configure(configuration: Partial<Configuration> = {}) {
         if (configuration.scope) {
             const scope = configuration.scope;
@@ -57,6 +56,10 @@ export class Logger {
                 this.config.scope[key] = defaultLevels[key];
             });
         }
+    }
+
+    public static set LogScope(scope: string) {
+        Logger.currentScope = scope;
     }
 
     public static set LogLevel(level: LogLevel) {
@@ -88,8 +91,13 @@ export class Logger {
         return `${Logger.config.scope.open}${this.prefixes.join(Logger.config.scope.delimiter)}${Logger.config.scope.close}${Logger.config.scope.end}`
     }
 
-    private _log(method: LogMethods, logLevel: LogLevel, ...args: any[]) {
-        if (this.logLevel >= logLevel) {
+    private get currentScope(): string {
+        return Logger.currentScope;
+    }
+
+    private _log(method: LogMethod, logLevel: LogLevel, ...args: any[]) {
+        const prefix = this.prefix;
+        if (this.logLevel >= logLevel && prefix.indexOf(this.currentScope) !== -1) {
             console[method](this.prefix, ...args);
         }
     }
@@ -105,15 +113,11 @@ export class Logger {
         this._log('error', this.config.defaultLevels.error, ...args);
     }
 
-    public debug(...args: any[]): void {
-        this._log('debug', this.config.defaultLevels.debug, ...args);
-    }
-
     public warn(...args: any[]): void {
         this._log('warn', this.config.defaultLevels.warn, ...args);
     }
 
-    public sub(prefix: string): Logger {
+    public subLogger(prefix: string): Logger {
         return new Logger([...this.prefixes, prefix]);
     }
 }

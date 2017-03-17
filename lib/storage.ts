@@ -1,6 +1,10 @@
 var sqlite3 = require('sqlite3').verbose();
-
 var pg = require('pg-promise')();
+
+import { getLogger } from './index';
+
+const logger = getLogger('storage');
+
 // var db = pg(process.env.DATABASE_URL);
 var db = pg({
   user: '***REMOVED***',
@@ -16,33 +20,49 @@ Promise.all([
   db.any('CREATE TABLE IF NOT EXISTS Channel (id int primary key, channel varchar(20) not null)')
 ])
   .then((results) => {
-    console.log('table created', results);
+    logger.info('table created', results);
     // return db.any(`INSERT INTO Channel VALUES (1,'289018837100396545')`);
     //setChannel('289018837100396545')
   }).catch(err => {
-    console.err(err);
+    logger.error(err);
   });
 
 export const addTag = (nick, tag) => {
   const stmt = `INSERT INTO Nicknames (nick, battletag) VALUES ('${nick}', '${tag}')`;
-  console.log('trying to add tag: ', nick, tag, stmt);
+  logger.info(`adding tag: ${stmt}`);
   return db.none(stmt)
   .catch(err =>  {
     const update = `UPDATE Nicknames set battletag = '${tag}' WHERE nick = '${nick}'`;
-    console.log(update)
+    logger.info('tag already exists, updating: ', update);
     return db.none(update).catch(err => {
-      console.log('error updating', err);
+      logger.log('error updating', err);
     })
   });
 };
 
-export const getTag = (nick) => db.one(`SELECT * from Nicknames where nick = '${nick}' LIMIT 1`)
-export const getAll = () => db.any('SELECT * from Nicknames')
-export const deleteTag = (nick) => db.none(`DELETE from Nicknames WHERE nick = '${nick}'`)
+export const getTag = (nick) => {
+  const stmt = `SELECT * from Nicknames where nick = '${nick}' LIMIT 1`;
+  logger.info('Getting Tag: ', stmt);
+  db.one(stmt)
+}
+export const getAll = () => { 
+  const stmt = 'SELECT * from Nicknames';
+  logger.info(`Loading all nicknames: ${stmt}`)
+  return db.any(stmt); 
+}
+export const deleteTag = (nick) => {
+  const stmt = `DELETE from Nicknames WHERE nick = '${nick}'`; 
+  logger.info(`Removing ${nick} from the database.: ${stmt}`)
+  return db.none(stmt)
+}
 
 export const setChannel = channel => {
   const stmt = `UPDATE Channel set channel = '${channel}' where id = 1`;
-  console.log('executing: ',stmt);
+  logger.info('Setting channel: ',stmt);
   return db.none(stmt);
 }
-export const getChannel = () => db.one('SELECT channel from Channel where id = 1');
+export const getChannel = () => {
+  const stmt = 'SELECT channel from Channel where id = 1';
+  logger.info('Getting Channel: ', stmt);
+  return db.one(stmt);
+}
