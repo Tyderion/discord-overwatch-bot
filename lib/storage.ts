@@ -20,7 +20,7 @@ Promise.all([
   db.any('CREATE TABLE IF NOT EXISTS Channel (id int primary key, channel varchar(20) not null)')
 ])
   .then((results) => {
-    logger.info('table created', results);
+    logger.info('tables created');
     // return db.any(`INSERT INTO Channel VALUES (1,'289018837100396545')`);
     //setChannel('289018837100396545')
   }).catch(err => {
@@ -43,7 +43,7 @@ export const addTag = (nick, tag) => {
 export const getTag = (nick) => {
   const stmt = `SELECT * from Nicknames where nick = '${nick}' LIMIT 1`;
   logger.info('Getting Tag: ', stmt);
-  db.one(stmt)
+  return db.one(stmt)
 }
 export const getAll = () => { 
   const stmt = 'SELECT * from Nicknames';

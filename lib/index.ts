@@ -22,6 +22,8 @@ const log = Logger.create('app');
 const logger = log.subLogger('main');
 Logger.LogLevel = LogLevel.ALL;
 
+Logger.LogScope = '';
+
 export const getLogger = (scope: string) => log.subLogger(scope);
 export const getCommandLogger = (scope: string) => log.subLogger('commands').subLogger(scope);
 

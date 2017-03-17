@@ -21,11 +21,7 @@ const getJson = <T>(url: string): Promise<T> => {
 
 const BASE_URL = 'https://api.lootbox.eu';
 const tagToUrl = (tag: string): string => tag.replace('#', '-');
-const createUrl = (tag: string, region: string, platform: string): string => {
-  const url =  `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`;
-  urlLogger.info('creating url for: ', platform,' - ',  region, ': ', url);
-  return url;
-}
+const createUrl = (tag: string, region: string, platform: string): string => `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`;
 
 export interface NameConverter {
   toDisplay: (string) => string;
