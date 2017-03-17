@@ -1,8 +1,13 @@
 import { CompAllHeroes, HeroUsage, Profile, HeroDetailsCommon, Wrapper, HeroDetails } from './types';
 import { get } from './request';
 
+import { getLogger } from './index';
+
+const logger = getLogger('owapi');
+const urlLogger = logger.subLogger('urls');
 
 const getJson = <T>(url: string): Promise<T> => {
+  logger.info(`Loading OWAPI Data: ${url}`)
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
   return get(url).then(data => {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
@@ -16,16 +21,11 @@ const getJson = <T>(url: string): Promise<T> => {
 
 const BASE_URL = 'https://api.lootbox.eu';
 const tagToUrl = (tag: string): string => tag.replace('#', '-');
-const createUrl = (tag: string, region: string, platform: string): string => {
-  const url = `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`;
-  console.log('creating url: ', platform,' - ',  region, ': ', url);
-  return `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`
-}
+const createUrl = (tag: string, region: string, platform: string): string => `${BASE_URL}/${platform}/${region}/${tagToUrl(tag)}`;
 
 export interface NameConverter {
   toDisplay: (string) => string;
   toUrl: (string) => string;
-
 }
 
 export const convertNames: NameConverter = (() => {

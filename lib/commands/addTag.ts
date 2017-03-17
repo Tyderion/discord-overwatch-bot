@@ -2,10 +2,15 @@ import { responseToSameChannel } from './../helper';
 import { Context } from './../types';
 import { Command } from '../modules/clapp-discord/index.js';
 import { addTag } from '../storage';
+import { getCommandLogger } from '../index';
+
+const COMMAND_NAME = 'tag';
+
+const logger = getCommandLogger(COMMAND_NAME);
 
 export default new Command({
-  name: "tag",
-  desc: "Adds a Tag to a nickname so info can easily be retrieved",
+  name: COMMAND_NAME,
+  desc: 'Adds a Tag to a nickname so info can easily be retrieved',
   args: [
     {
       name: 'nickname',
@@ -24,6 +29,7 @@ export default new Command({
   ],
   fn: (argv, context: Context) => {
     responseToSameChannel(context);
+    logger.info(`Adding Tag: '${argv.args.nickname}' = '${argv.args.battletag}'`);
     return addTag(argv.args.nickname, argv.args.battletag).then(() => `Successfully added battletag ${argv.args.battletag} as ${argv.args.nickname}`);
   }
 });

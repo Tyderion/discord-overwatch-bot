@@ -7,13 +7,16 @@ import { Command } from '../modules/clapp-discord/index.js';
 import { getChannel } from '../storage';
 import { RichEmbed } from 'discord.js';
 import { get } from './../request';
+import { getCommandLogger } from '../index';
+
+const COMMAND_NAME = 'bp';
+const logger = getCommandLogger(COMMAND_NAME);
 
 // Test: !tow bp https://us.battle.net/forums/en/overwatch/topic/20753436342
 
 export default new Command({
-  name: "bp",
-  desc: "Parses the linked blue battle.net forum post and transcribes the content to the channel",
-
+  name: COMMAND_NAME,
+  desc: 'Parses the linked blue battle.net forum post and transcribes the content to the channel',
   args: [
     {
       name: 'url',
@@ -36,6 +39,7 @@ export default new Command({
           context.msg.delete();
         }
         const url = argv.args.url.startsWith('http') ? argv.args.url : 'https://' + argv.args.url;
+        logger.info('Getting Bluepost: ', url);
         get(url).then(body => {
           const posturl = URL.parse(url);
           const $ = cheerio.load(body);
@@ -50,39 +54,41 @@ export default new Command({
             .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
             .replace(/<span class="underline">(.*?)<\/span>/g, '__$1__');
           let text = cheerio.load(postcontent).text();
-          let embeds: RichEmbed[] = [];
+          let embeds: RichEmbed[];
           if (text.length > 2000) {
+            logger.info(`Bluepost is toolong (${text.length}/2000), splitting into multiple embeds`);
             const parts = text.replace(/\n\n/g, '\n').split('\n');
             const combined = parts.reduce((acc, part) => {
-              const curr = acc[acc.length -1];
+              const curr = acc[acc.length - 1];
               if (curr.length + part.length < 2000) {
-                acc[acc.length - 1] = curr +'\n\n'+ part;
+                acc[acc.length - 1] = curr + '\n\n' + part;
               } else {
                 acc[acc.length] = part;
               }
               return acc;
             }, ['']);
-            combined.forEach((part, index) => {
-              embeds.push(new RichEmbed({
-                title: `${title} Part ${index+1}`,
-                description: part,
-                url: url,
-                timestamp: moment(posttime, 'MM/DD/YYYY hh:mm a').toDate(),
-                author: {
-                  name: author
-                }
-              }));
-            });
-          } else {
-            embeds.push(new RichEmbed({
-              title: title,
-              description: text.substring(0, 2050),
+            logger.info(`Bluepost split into ${combined.length} parts.`);
+            embeds = combined.map((part, index) => new RichEmbed({
+              title: `${title} Part ${index + 1}`,
+              description: part,
               url: url,
               timestamp: moment(posttime, 'MM/DD/YYYY hh:mm a').toDate(),
               author: {
                 name: author
               }
             }));
+          } else {
+            embeds = [
+              new RichEmbed({
+                title: title,
+                description: text.substring(0, 2050),
+                url: url,
+                timestamp: moment(posttime, 'MM/DD/YYYY hh:mm a').toDate(),
+                author: {
+                  name: author
+                }
+              })
+            ];
           }
 
           context.responseConfig.embeds = embeds;

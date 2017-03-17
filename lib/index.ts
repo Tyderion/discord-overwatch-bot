@@ -2,6 +2,7 @@
 require('node-sigint');
 
 import { Context } from './types';
+import {Logger, LogLevel } from './logger';
 
 const fs = require('fs');
 const Clapp = require('./modules/clapp-discord');
@@ -17,6 +18,15 @@ var server = http.createServer(function (request, response) {
 });
 server.listen(process.env.PORT);
 
+const log = Logger.create('app');
+const logger = log.subLogger('main');
+Logger.LogLevel = LogLevel.ALL;
+
+Logger.LogScope = '';
+
+export const getLogger = (scope: string) => log.subLogger(scope);
+export const getCommandLogger = (scope: string) => log.subLogger('commands').subLogger(scope);
+
 var app = new Clapp.App({
   name: cfg.name,
   desc: pkg.description,
@@ -28,8 +38,7 @@ var app = new Clapp.App({
       if (context.responseConfig.useEmbed) {
         context.responseConfig.embeds.reduce((acc, curr) => {
           return bot.channels.get(context.responseConfig.channel).sendEmbed(curr).catch(err => console.log(err.message));
-        }, Promise.resolve())
-        // bot.channels.get(context.responseConfig.channel).sendEmbed(context.responseConfig.embed).catch(err => console.log(err.message));
+        }, Promise.resolve());
       } else {
         bot.channels.get(context.responseConfig.channel).sendMessage(msg);
       }
@@ -60,8 +69,6 @@ fs.readdirSync('./lib/commands/').forEach(file => {
   }
 });
 
-bot.on('ready', () => console.log('ready'));
-
 bot.on('message', msg => {
   // Fired when someone sends a message
 
@@ -77,16 +84,16 @@ bot.on('message', msg => {
 });
 
 bot.login(cfg.token).then(() => {
-  console.log('Running! on windows');
+  logger.info('Bot logged in');
   bot.user.setPresence({
     game: { name: cfg.prefix }
   }).then((client) => {
-    console.log('presence set', client.localPresence);
+    logger.info('presence set', client.localPresence);
   });
 });
 
 function exit() {
-  console.log('exiting');
+  logger.info('exiting');
   bot.user.setPresence({
     status: 'invisible'
   });
@@ -101,7 +108,7 @@ if (process.platform === "win32") {
   });
 
   rl.on("SIGINT", function () {
-    console.log('win sigint');
+    logger.info('win sigint');
     process.emit("SIGINT");
   });
 }
@@ -110,13 +117,4 @@ process.on('SIGHUP', () => process.exit());
 process.on('SIGTERM', () => process.exit());
 process.on('SIGBREAK', () => process.exit());
 
-process.on('SIGINT', function () {
-  console.log('normal sigint');
-  process.exit();
-  // bot.user.setPresence({
-  //   status: 'invisible'
-  // }).then((result) => {
-  //   console.log('user: ', result.localPresence);
-  //   process.exit();
-  // });
-});
+process.on('SIGINT', () => process.exit());
