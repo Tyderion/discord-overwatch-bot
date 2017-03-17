@@ -5,8 +5,6 @@ module.exports = {
   name: "YOUR-BOT-USERNAME",
 
   // The bot's command prefix. The bot will recognize as command any message that begins with it.
-  // i.e: "-tyderion's' overwatch bot foo" will trigger the command "foo",
-  //      whereas "YOUR-BOT-USERNAME foo" will do nothing at all.
   prefix:  "!tow",
 
   // Your bot's user token. If you don't know what that is, go here:

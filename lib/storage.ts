@@ -5,15 +5,7 @@ import { getLogger } from './index';
 
 const logger = getLogger('storage');
 
-// var db = pg(process.env.DATABASE_URL);
-var db = pg({
-  user: '***REMOVED***',
-   password: "***REMOVED***",
-    database: "***REMOVED***",
-    port: 0 /***REMOVED***/,
-    host: "***REMOVED***",
-    ssl: true
-});
+var db = pg(process.env.DATABASE_URL);
 
 Promise.all([
   db.any('CREATE TABLE IF NOT EXISTS Nicknames (nick varchar(20) not null unique, battletag varchar(50) not null)'),
@@ -21,8 +13,6 @@ Promise.all([
 ])
   .then((results) => {
     logger.info('tables created');
-    // return db.any(`INSERT INTO Channel VALUES (1,'289018837100396545')`);
-    //setChannel('289018837100396545')
   }).catch(err => {
     logger.error(err);
   });
