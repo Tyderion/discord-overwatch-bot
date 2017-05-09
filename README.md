@@ -22,3 +22,5 @@ npm run watch
 ## License
 
 MIT © [Tyderion](https://github.com/Tyderion)
+
+check: http://www.overstalk.io/?sources=BLIZZARD_FORUM&_sources=on&_sources=on&_sources=on&_sources=on for automatic blueposts
